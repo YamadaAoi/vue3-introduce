@@ -1,0 +1,40 @@
+{
+  "name": "vue3-introduce",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "start": "pnpm run dev",
+    "lint:code": "eslint \"src/**/*.{ts,tsx,js,jsx,vue}\"",
+    "lint:fix": "eslint \"src/**/*.{ts,tsx,js,jsx,vue}\" --fix",
+    "dev": "vite --host 0.0.0.0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^0.26.0",
+    "maplibre-gl": "^2.1.6",
+    "vue": "^3.2.25"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.21",
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "@vitejs/plugin-vue": "^2.2.0",
+    "@vitejs/plugin-vue-jsx": "^1.3.7",
+    "eslint": "^8.9.0",
+    "eslint-config-prettier": "^8.4.0",
+    "eslint-config-standard-with-typescript": "^21.0.1",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-vue": "^8.4.1",
+    "prettier": "^2.5.1",
+    "sass": "^1.49.8",
+    "ts-node": "^10.5.0",
+    "typescript": "^4.5.4",
+    "vfonts": "^0.0.3",
+    "vite": "^2.8.0",
+    "vue-eslint-parser": "^8.2.0",
+    "vue-tsc": "^0.29.8"
+  }
+}
