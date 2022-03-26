@@ -10,8 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@turf/turf": "^6.5.0",
     "axios": "^0.26.0",
     "maplibre-gl": "^2.1.6",
+    "naive-ui": "^2.26.4",
     "vue": "^3.2.25"
   },
   "devDependencies": {
