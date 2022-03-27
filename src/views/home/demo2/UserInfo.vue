@@ -2,7 +2,7 @@
  * @Author: zhouyinkui
  * @Date: 2022-03-27 01:16:11
  * @LastEditors: zhouyinkui
- * @LastEditTime: 2022-03-27 16:55:54
+ * @LastEditTime: 2022-03-27 17:07:01
  * @Description: 用户信息
  * Copyright (c) 2022 by piesat, All Rights Reserved. 
 -->
@@ -30,16 +30,18 @@
 import { bbox, Feature } from '@turf/turf'
 import { LngLatBounds, Map } from 'maplibre-gl'
 import { NPopover } from 'naive-ui'
-import { onMounted, ref, toRefs, watch } from 'vue'
-import { getDataById } from './user_info_api'
+import { onMounted, ref, toRefs } from 'vue'
+import useFootGeo from './use_foot_geo'
+import useUserFoots from './use_user_foots'
 
 const props = defineProps<{
   user: string
   map?: Map
 }>()
 const { user } = toRefs(props)
-const foots = ref<string[]>([])
 const curFoot = ref<string>()
+const { foots } = useUserFoots(user)
+useFootGeo(curFoot, setData)
 
 onMounted(() => {
   if (props.map) {
@@ -69,30 +71,6 @@ onMounted(() => {
   }
 })
 
-watch(
-  user,
-  next => {
-    if (next) {
-      getFoot(next).catch(err => {
-        console.error(err)
-      })
-    }
-  },
-  { immediate: true }
-)
-
-watch(
-  curFoot,
-  next => {
-    if (next) {
-      getGeo(next).catch(err => {
-        console.error(err)
-      })
-    }
-  },
-  { immediate: true }
-)
-
 function chooseItem(foot: string) {
   curFoot.value = foot
 }
@@ -110,20 +88,6 @@ function setData(geo: Feature) {
         )
       }
     }
-  }
-}
-
-async function getFoot(userId: string) {
-  const resp = await getDataById(userId)
-  if (resp?.data) {
-    foots.value = resp.data.foots ?? []
-  }
-}
-
-async function getGeo(id: string) {
-  const resp = await getDataById(id)
-  if (resp?.data?.type === 'Feature') {
-    setData(resp.data as Feature)
   }
 }
 </script>

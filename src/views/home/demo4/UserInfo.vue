@@ -2,14 +2,17 @@
  * @Author: zhouyinkui
  * @Date: 2022-03-27 01:16:11
  * @LastEditors: zhouyinkui
- * @LastEditTime: 2022-03-27 16:55:54
+ * @LastEditTime: 2022-03-27 18:12:19
  * @Description: 用户信息
  * Copyright (c) 2022 by piesat, All Rights Reserved. 
 -->
 <template>
   <n-popover placement="left-start">
     <template #trigger>
-      <div class="user-icon"></div>
+      <div
+        class="user-icon"
+        :style="{ 'background-color': theme?.color }"
+      ></div>
     </template>
     <div class="user-foot">
       <template v-if="foots.length">
@@ -24,22 +27,35 @@
       </template>
     </div>
   </n-popover>
+  <map-popup :map="props.map" :lng-lat="lngLat">
+    <div>市：{{ properties?.shi }}</div>
+    <div>区：{{ properties?.qu }}</div>
+    <div>街道：{{ properties?.jiedao }}</div>
+    <div>社区：{{ properties?.shequ }}</div>
+  </map-popup>
 </template>
 
 <script setup lang="ts">
 import { bbox, Feature } from '@turf/turf'
-import { LngLatBounds, Map } from 'maplibre-gl'
+import { LngLatBounds, LngLatLike, Map, MapMouseEvent } from 'maplibre-gl'
 import { NPopover } from 'naive-ui'
-import { onMounted, ref, toRefs, watch } from 'vue'
-import { getDataById } from './user_info_api'
+import { onMounted, ref, toRefs, inject, Ref } from 'vue'
+import useFootGeo from '../demo2/use_foot_geo'
+import useUserFoots from '../demo2/use_user_foots'
+import MapPopup from '../demo3/MapPopup.vue'
+import { CustomTheme } from './theme_provider'
 
 const props = defineProps<{
   user: string
   map?: Map
 }>()
 const { user } = toRefs(props)
-const foots = ref<string[]>([])
 const curFoot = ref<string>()
+const { foots } = useUserFoots(user)
+useFootGeo(curFoot, setData)
+const lngLat = ref<LngLatLike>()
+const properties = ref<any>()
+const theme: Ref<CustomTheme | undefined> | undefined = inject('theme-provide')
 
 onMounted(() => {
   if (props.map) {
@@ -66,32 +82,20 @@ onMounted(() => {
         'fill-opacity': 0.7
       }
     })
+    props.map.on('click', 'footLayer', onLayerClick)
   }
 })
 
-watch(
-  user,
-  next => {
-    if (next) {
-      getFoot(next).catch(err => {
-        console.error(err)
-      })
-    }
-  },
-  { immediate: true }
-)
-
-watch(
-  curFoot,
-  next => {
-    if (next) {
-      getGeo(next).catch(err => {
-        console.error(err)
-      })
-    }
-  },
-  { immediate: true }
-)
+function onLayerClick(
+  e: MapMouseEvent & {
+    features?: Array<Feature<any, any>> | undefined
+  } & unknown
+) {
+  if (e.lngLat && e.features?.length) {
+    lngLat.value = e.lngLat
+    properties.value = e.features[0].properties
+  }
+}
 
 function chooseItem(foot: string) {
   curFoot.value = foot
@@ -110,20 +114,6 @@ function setData(geo: Feature) {
         )
       }
     }
-  }
-}
-
-async function getFoot(userId: string) {
-  const resp = await getDataById(userId)
-  if (resp?.data) {
-    foots.value = resp.data.foots ?? []
-  }
-}
-
-async function getGeo(id: string) {
-  const resp = await getDataById(id)
-  if (resp?.data?.type === 'Feature') {
-    setData(resp.data as Feature)
   }
 }
 </script>
